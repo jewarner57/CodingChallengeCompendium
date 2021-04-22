@@ -26,7 +26,9 @@
 
 > Solutions param should be a json object containing an array of ordered solutions to all tests given in the challenge.
 
-> A response will contain either a success message or a failure message containing the test that caused the failure
+A response will contain either a success message or a failure message containing the test that caused the failure
+
+If a solution is successful it will be applied to the currently logged in user's account
 
 ```
 /challenges/<challenge id>/solve?solutions={test solutions}
@@ -55,5 +57,29 @@ Get one data structure or algorithm by id
 /dsa/id
 ```
 
-/users/<user id>
+## Working with users
+
+### Creating a user
+> Creating a user must be done with a POST request with fields: name, email, and password
+```
+/create-user/
+```
+
+### Getting a user by id
+```
+/users/<id>
+```
+
+### Logging in a user
+> Logging in a user must be done with a POST request with fields: email, password
+```
+/login
+```
+
+### Logging out a user
+```
+/logout
+```
+
+###
 
