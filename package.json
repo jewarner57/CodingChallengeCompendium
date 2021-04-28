@@ -1,0 +1,54 @@
+{
+  "name": "coding_challenge_compendium",
+  "version": "1.0.0",
+  "description": "An api for creating and solving coding challenges",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "eslintConfig": {
+    "extends": "airbnb-base",
+    "rules": {
+      "no-console": 0,
+      "no-unused-vars": 1,
+      "semi": 0,
+      "no-underscore-dangle": 0,
+      "func-names": 0,
+      "no-shadow": 0,
+      "consistent-return": 0,
+      "no-undef": 0
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jewarner57/CodingChallengeCompendium.git"
+  },
+  "author": "Jonathan Warner",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jewarner57/CodingChallengeCompendium/issues"
+  },
+  "homepage": "https://github.com/jewarner57/CodingChallengeCompendium#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "5.3.1",
+    "jsonwebtoken": "^8.5.1",
+    "mocha": "^8.3.2",
+    "mongoose": "^5.12.6"
+  },
+  "devDependencies": {
+    "eslint": "^7.25.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  }
+}

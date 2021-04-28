@@ -7,12 +7,12 @@
 ### Query all challenges
 
 ```
-/challenges?name={cname}&difficulty={diff}&dsa={ids of ds or a}&companies={company ids}
+/challenges?q={query}&difficulty={diff}&dsa={ids of ds or a}&companies={company ids}
 ```
 
 | Parameter |           | Description            |
 |-----------|-----------|------------------------|
-| name      | optional  | The name to be contained in returned challenges|
+| q         | optional  | The query string to be contained in returned challenges|
 | difficulty| optional  | The difficulty of challenges to return|
 | dsa       | optional  | An array of ids of data structures or algorithms that should be tagged on the challenge|
 | companies | optional  | An array of ids of  companies that should be tagged on the challenge|
@@ -26,7 +26,9 @@
 
 > Solutions param should be a json object containing an array of ordered solutions to all tests given in the challenge.
 
-A response will contain either a success message or a failure message containing the test that caused the failure
+> Ex solutions object: {"solutions": [{[0, 1, 2]}, {[7, 8, 9]}]}
+
+A response will contain either an object {success: true} or an object: {success: false, failedOn: [test that failed]}
 
 If a solution is successful it will be applied to the currently logged in user's account
 
