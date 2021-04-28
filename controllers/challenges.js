@@ -17,14 +17,29 @@ module.exports = (app) => {
       });
   })
 
-  app.post('/challenges/:id/solve', (req, res) => {
+  app.post('/challenges/:id/solve', (req, res, next) => {
     Challenge.findById(req.params.id)
       .then((challenge) => {
-        if (challengeToSolve.testsolutions === solution.attempt) {
-          res.send({ success: true })
-        } else {
-          res.send({ success: false, failedOn: 'something' })
+        const solution = req.body.attempt
+        const challengeToSolve = challenge.testsolutions
+        let solved = true
+
+        // For each solution
+        for (let i = 0; i < solution.length; i += 1) {
+          // check if it equals the challenge solution
+          if (JSON.stringify(challengeToSolve[i]) !== JSON.stringify(solution[i])) {
+            // If it doesnt match, send index of test it failed on and user friendly message
+            solved = false
+            res.send({
+              success: false,
+              failedOn: i,
+              message: `expected: ${challengeToSolve[i]}, but recieved: ${solution[i]}`,
+            })
+          }
         }
+
+        // If all matches were found send success
+        if (solved) { res.send({ success: true }) }
       })
       .catch((err) => {
         console.log(err.message);

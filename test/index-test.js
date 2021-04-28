@@ -103,9 +103,11 @@ describe('Challenge API Endpoints', () => {
   // })
 
   it('should solve a challenge', (done) => {
-    const solutionsArr = { attempt: [[1, 2, 3], [4, 5, 6], [90, 91, 92, 93, 94]] }
+    const solutionsArr = JSON.stringify({ attempt: [[1, 2, 3], [4, 5, 6], [90, 91, 92, 93, 94]] })
     chai.request(app)
-      .get(`/challenges/${challengeId}/solve?solutions=${JSON.stringify(solutionsArr)}`)
+      .post(`/challenges/${challengeId}/solve`)
+      .set('content-type', 'application/json;charset=UTF-8')
+      .send(solutionsArr)
       .end((err, res) => {
         if (err) { done(err) }
         expect(res).to.have.status(200)
@@ -118,19 +120,19 @@ describe('Challenge API Endpoints', () => {
   })
 
   it('should fail to solve a challenge', (done) => {
-    const solutionsArr = { attempt: [0] }
+    const solutionsArr = JSON.stringify({ attempt: [0] })
+    chai.request(app)
+      .post(`/challenges/${challengeId}/solve`)
+      .set('content-type', 'application/json;charset=UTF-8')
+      .send(solutionsArr)
+      .end((err, res) => {
+        if (err) { done(err) }
+        expect(res).to.have.status(200)
+        expect(res.body).to.be.an('object')
+        expect(res.body.success).to.equal(false)
+        expect(res.body.failedOn).to.not.equal(undefined)
 
-    // this needs to be a post request
-    // chai.request(app)
-    //   .get(`/challenges/${challengeId}/solve?solutions=${JSON.stringify(solutionsArr)}`)
-    //   .end((err, res) => {
-    //     if (err) { done(err) }
-    //     expect(res).to.have.status(200)
-    //     expect(res.body).to.be.an('object')
-    //     expect(res.body.success).to.equal(false)
-    //     expect(res.body.failedOn).to.not.equal(undefined)
-
-    //     done()
-    //   })
+        done()
+      })
   })
 })
