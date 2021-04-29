@@ -28,6 +28,7 @@ after((done) => {
 
 describe('Challenge API Endpoints', () => {
   let challengeId = ''
+  let challengeId2 = ''
 
   beforeEach((done) => {
     const sampleChallenge = new Challenge({
@@ -39,19 +40,30 @@ describe('Challenge API Endpoints', () => {
     })
     challengeId = sampleChallenge._id
 
+    const sampleChallenge2 = new Challenge({
+      name: 'just-another-problem',
+      difficulty: 10,
+      description: 'a problem',
+      testcases: [0],
+      testsolutions: [0],
+    })
+
+    challengeId2 = sampleChallenge2._id
+
     const sampleUser = new User({
       username: 'my username',
       password: 'my password',
     })
 
     sampleChallenge.save().catch((err) => { console.log(err) })
+    sampleChallenge2.save().catch((err) => { console.log(err) })
     sampleUser.save().catch((err) => { console.log(err) })
 
     done()
   })
 
   afterEach((done) => {
-    Challenge.deleteMany({ name: ['sample challenge'] })
+    Challenge.deleteMany({ name: ['sample challenge', 'just-another-problem'] })
       .then(() => {
         User.deleteMany({ username: ['my username'] })
           .then(() => {
@@ -90,17 +102,34 @@ describe('Challenge API Endpoints', () => {
       })
   })
 
-  // it('should get filtered list of challenges', (done) => {
-  //   chai.request(app)
-  //     .get('/challenges?q="challenge"&difficulty="1')
-  //     .end((err, res) => {
-  //       if (err) { done(err) }
-  //       expect(res).to.have.status(200)
-  //       expect(res.body.challenges).to.be.an("array")
+  it('should get filtered list of challenges by difficulty', (done) => {
+    chai.request(app)
+      .get('/challenges?difficulty=10')
+      .end((err, res) => {
+        if (err) { done(err) }
+        expect(res).to.have.status(200)
+        expect(res.body).to.be.an('array')
+        expect(res.body).to.have.lengthOf(1);
+        expect(res.body[0].difficulty).to.equal(10)
 
-  //       done()
-  //     })
-  // })
+        done()
+      })
+  })
+
+  it('should get filtered list of challenges by name', (done) => {
+    chai.request(app)
+      .get('/challenges?q=just-another-problem')
+      .end((err, res) => {
+        if (err) { done(err) }
+        expect(res).to.have.status(200)
+        expect(res.body).to.be.an('array')
+        expect(res.body).to.have.lengthOf(1);
+        expect(res.body[0].name).to.contain('just-another-problem')
+        expect(res.body[0].difficulty).to.equal(10)
+
+        done()
+      })
+  })
 
   it('should solve a challenge', (done) => {
     const solutionsArr = JSON.stringify({ attempt: [[1, 2, 3], [4, 5, 6], [90, 91, 92, 93, 94]] })
