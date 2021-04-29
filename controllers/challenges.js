@@ -1,6 +1,7 @@
 const Challenge = require('../models/challenge');
 
 module.exports = (app) => {
+  // GET filtered challenges
   app.get('/challenges', (req, res) => {
     const name = req.query.q
     const diff = req.query.difficulty
@@ -21,6 +22,7 @@ module.exports = (app) => {
       .catch((err) => console.log(err))
   })
 
+  // GET a challenge by ID
   app.get('/challenges/:id', (req, res) => {
     Challenge.findById(req.params.id)
       .then((challenge) => {
@@ -31,6 +33,29 @@ module.exports = (app) => {
       });
   })
 
+  // CREATE a challenge
+  app.post('/challenges/', (req, res) => {
+    const challenge = new Challenge(req.body)
+    challenge.save()
+      .then((newChall) => res.json({ challenge: newChall }))
+      .catch((err) => {
+        throw err.message
+      })
+  })
+
+  // UPDATE a challenge
+  app.put('/challenges/:id', (req, res) => {
+    Challenge.findByIdAndUpdate(req.params.id, req.body)
+      .then(() => Challenge.findOne({ _id: req.params.id }))
+      .then((challenge) => {
+        res.json({ challenge })
+      })
+      .catch((err) => {
+        throw err.message
+      })
+  })
+
+  // SOLVE a challenge
   app.post('/challenges/:id/solve', (req, res, next) => {
     Challenge.findById(req.params.id)
       .then((challenge) => {
@@ -58,5 +83,21 @@ module.exports = (app) => {
       .catch((err) => {
         console.log(err.message);
       });
+  })
+
+  // DELETE a challenge
+  app.delete('/challenges/:id', (req, res) => {
+    Challenge.findByIdAndDelete(req.params.id).then((result) => {
+      if (result === null) {
+        return res.json({ message: 'User does not exist.' })
+      }
+      return res.json({
+        message: 'Successfully deleted.',
+        _id: req.params.id,
+      })
+    })
+      .catch((err) => {
+        throw err.message
+      })
   })
 }

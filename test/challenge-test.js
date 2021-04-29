@@ -8,6 +8,7 @@ const { assert } = chai
 
 const User = require('../models/user.js')
 const Challenge = require('../models/challenge.js')
+const challenge = require('../models/challenge.js')
 
 chai.config.includeStack = true
 
@@ -28,7 +29,6 @@ after((done) => {
 
 describe('Challenge API Endpoints', () => {
   let challengeId = ''
-  let challengeId2 = ''
 
   beforeEach((done) => {
     const sampleChallenge = new Challenge({
@@ -48,8 +48,6 @@ describe('Challenge API Endpoints', () => {
       testsolutions: [0],
     })
 
-    challengeId2 = sampleChallenge2._id
-
     const sampleUser = new User({
       username: 'my username',
       password: 'my password',
@@ -63,7 +61,7 @@ describe('Challenge API Endpoints', () => {
   })
 
   afterEach((done) => {
-    Challenge.deleteMany({ name: ['sample challenge', 'just-another-problem'] })
+    Challenge.deleteMany({ name: ['sample challenge', 'just-another-problem', 'A created challenge'] })
       .then(() => {
         User.deleteMany({ username: ['my username'] })
           .then(() => {
@@ -162,6 +160,67 @@ describe('Challenge API Endpoints', () => {
         expect(res.body.failedOn).to.not.equal(undefined)
 
         done()
+      })
+  })
+
+  it('should create a challenge', (done) => {
+    const newChallenge = {
+      name: 'A created challenge',
+      difficulty: 5,
+      description: 'some description',
+      testcases: [0],
+      testsolutions: [0],
+    }
+    chai.request(app)
+      .post('/challenges/')
+      .send(newChallenge)
+      .end((err, res) => {
+        if (err) { done(err) }
+        expect(res).to.have.status(200)
+        Challenge.find(res._id).then((challenge) => {
+          expect(challenge).to.be.not.null
+          expect(challenge.name).to.be.equal('A created challenge')
+        })
+        done()
+      })
+  })
+
+  it('should update a challenge', (done) => {
+    chai.request(app)
+      .put(`/challenges/${challengeId}`)
+      .send({ difficulty: 8 })
+      .end((err, res) => {
+        if (err) { done(err) }
+        expect(res).to.have.status(200)
+        expect(res.body.challenge).to.be.an('object')
+        expect(res.body.challenge).to.have.property('difficulty', 8)
+
+        // check that the challenge is actually inserted into database
+        Challenge.findOne({ _id: challengeId }).then((chall) => {
+          expect(chall).to.be.an('object')
+          done()
+        }).catch((err) => {
+          done(err)
+        })
+      })
+  })
+
+  it('should delete a challenge', (done) => {
+    chai.request(app)
+      .delete(`/challenges/${challengeId}`)
+      .end((err, res) => {
+        if (err) { done(err) }
+        expect(res).to.have.status(200)
+        expect(res.body.message).to.equal('Successfully deleted.')
+        expect(res.body._id).to.equal(String(challengeId))
+
+        // check that challenge is actually deleted from database
+        Challenge.findOne({ _id: challengeId }).then((challenge) => {
+          expect(challenge).to.equal(null)
+          done()
+        }).catch((err) => {
+          done(err)
+        })
       })
   })
 })
