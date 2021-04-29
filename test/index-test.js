@@ -118,7 +118,7 @@ describe('Challenge API Endpoints', () => {
 
   it('should get filtered list of challenges by name', (done) => {
     chai.request(app)
-      .get('/challenges?q=just-another-problem')
+      .get('/challenges?q=problem')
       .end((err, res) => {
         if (err) { done(err) }
         expect(res).to.have.status(200)

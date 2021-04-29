@@ -8,15 +8,13 @@
 
 ```
 // GET
-/challenges?q={query}&difficulty={diff}&dsa={ids of ds or a}&companies={company ids}
+/challenges?q={query}&difficulty={diff}}
 ```
 
 | Parameter |           | Description            |
 |-----------|-----------|------------------------|
 | q         | optional  | The query string to be contained in returned challenges|
 | difficulty| optional  | The difficulty of challenges to return|
-| dsa       | optional  | An array of ids of data structures or algorithms that should be tagged on the challenge|
-| companies | optional  | An array of ids of  companies that should be tagged on the challenge|
 
 ### Get a challenge by id
 ```
@@ -45,33 +43,6 @@ If a solution is successful it will be applied to the currently logged in user's
 ```
 // POST
 /challenges/<challenge id>/solve
-```
-
-## Getting Companies
-Get all companies
-```
-// GET
-/companies
-```
-
-Get one company by id
-```
-// GET
-/companies/id
-```
-
-
-## Getting Data Structures and Algorithms Tags
-Get all data structures and algorithms
-```
-// GET
-/dsa
-```
-
-Get one data structure or algorithm by id
-```
-// GET
-/dsa/id
 ```
 
 ## Working with users

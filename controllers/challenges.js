@@ -2,7 +2,21 @@ const Challenge = require('../models/challenge');
 
 module.exports = (app) => {
   app.get('/challenges', (req, res) => {
-    Challenge.find({})
+    const name = req.query.q
+    const diff = req.query.difficulty
+
+    queryObject = {}
+    if (name) {
+      // If the challenge name contains the query string
+      queryObject.name = { $regex: name, $options: 'i' }
+    }
+    if (diff) {
+      // If the challenge difficulty matches
+      queryObject.difficulty = diff
+    }
+
+    // Search for valid challenges and send them
+    Challenge.find(queryObject)
       .then((challenges) => res.send(challenges))
       .catch((err) => console.log(err))
   })
