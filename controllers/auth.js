@@ -29,6 +29,7 @@ module.exports = (app) => {
   // LOGOUT
   app.get('/logout', (req, res) => {
     res.clearCookie('nToken');
+    res.json({ message: 'Logout Successful' })
   });
 
   // LOGIN
@@ -52,8 +53,9 @@ module.exports = (app) => {
           const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET, {
             expiresIn: '60 days',
           });
-          // Set a cookie and redirect to root
+          // Set a cookie
           res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
+          res.json({ message: 'Login Successful' })
         });
       })
       .catch((err) => {

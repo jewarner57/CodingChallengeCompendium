@@ -127,6 +127,29 @@ describe('User API endpoints', () => {
       })
   })
 
-  // TODO: LOGOUT TEST
-  // TODO: LOGIN TEST
+  // POST Login
+  it('should be able to login', (done) => {
+    chai.request(app)
+      .post('/login')
+      .send({ email: 'user@test.com', password: 'mypassword' })
+      .end((err, res) => {
+        if (err) { done(err) }
+
+        expect(res).to.have.status(200)
+        expect(res).to.have.cookie('nToken');
+        expect(res.body.message).to.be.equal('Login Successful')
+        done();
+      })
+  });
+
+  // Logout
+  it('should be able to logout', (done) => {
+    chai.request(app)
+      .get('/logout').end((err, res) => {
+        res.should.have.status(200);
+        expect(res).to.not.have.cookie('nToken')
+        expect(res.body.message).to.be.equal('Logout Successful')
+        done();
+      });
+  });
 })
