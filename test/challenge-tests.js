@@ -8,7 +8,6 @@ const { assert } = chai
 
 const User = require('../models/user.js')
 const Challenge = require('../models/challenge.js')
-const challenge = require('../models/challenge.js')
 
 chai.config.includeStack = true
 
@@ -49,7 +48,7 @@ describe('Challenge API Endpoints', () => {
     })
 
     const sampleUser = new User({
-      username: 'my username',
+      email: 'test@user.com',
       password: 'my password',
     })
 
@@ -63,7 +62,7 @@ describe('Challenge API Endpoints', () => {
   afterEach((done) => {
     Challenge.deleteMany({ name: ['sample challenge', 'just-another-problem', 'A created challenge'] })
       .then(() => {
-        User.deleteMany({ username: ['my username'] })
+        User.deleteMany({ email: ['test@user.com'] })
           .then(() => {
             done()
           }).catch((err) => {

@@ -2,10 +2,11 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 module.exports = (app) => {
-  // SIGN UP FORM
-  app.get('/sign-up', (req, res) => {
-    res.render('sign-up');
-  });
+  app.get('/users/:id', (req, res) => {
+    User.findOne({ _id: req.params.id })
+      .then((user) => res.send(user))
+      .catch((err) => console.log(err))
+  })
 
   // SIGN UP POST
   app.post('/sign-up', (req, res) => {
@@ -17,7 +18,7 @@ module.exports = (app) => {
       .then((user) => {
         const token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: '60 days' });
         res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
-        res.redirect('/');
+        res.json({ user })
       })
       .catch((err) => {
         console.log(err.message);
@@ -28,42 +29,63 @@ module.exports = (app) => {
   // LOGOUT
   app.get('/logout', (req, res) => {
     res.clearCookie('nToken');
-    res.redirect('/login');
-  });
-
-  // LOGIN FORM
-  app.get('/login', (req, res) => {
-    res.render('login');
   });
 
   // LOGIN
   app.post('/login', (req, res) => {
-    const { username } = req.body;
+    const { email } = req.body;
     const { password } = req.body;
     // Find this user name
-    User.findOne({ username }, 'username password')
+    User.findOne({ email }, 'email password')
       .then((user) => {
         if (!user) {
           // User not found
-          return res.status(401).send({ message: 'Wrong Username or Password' });
+          return res.status(401).send({ message: 'Wrong Email or Password' });
         }
         // Check the password
         user.comparePassword(password, (err, isMatch) => {
           if (!isMatch) {
             // Password does not match
-            return res.status(401).send({ message: 'Wrong Username or password' });
+            return res.status(401).send({ message: 'Wrong Email or password' });
           }
           // Create a token
-          const token = jwt.sign({ _id: user._id, username: user.username }, process.env.SECRET, {
+          const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET, {
             expiresIn: '60 days',
           });
           // Set a cookie and redirect to root
           res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
-          res.redirect('/');
         });
       })
       .catch((err) => {
         console.log(err);
       });
   });
+
+  // UPDATE a user
+  app.put('/users/:id', (req, res) => {
+    User.findByIdAndUpdate(req.params.id, req.body)
+      .then(() => User.findOne({ _id: req.params.id }))
+      .then((user) => {
+        res.json({ user })
+      })
+      .catch((err) => {
+        throw err.message
+      })
+  })
+
+  // DELETE a user
+  app.delete('/users/:id', (req, res) => {
+    User.findByIdAndDelete(req.params.id).then((result) => {
+      if (result === null) {
+        return res.json({ message: 'User does not exist.' })
+      }
+      return res.json({
+        message: 'Successfully deleted.',
+        _id: req.params.id,
+      })
+    })
+      .catch((err) => {
+        throw err.message
+      })
+  })
 }

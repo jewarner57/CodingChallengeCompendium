@@ -89,7 +89,7 @@ module.exports = (app) => {
   app.delete('/challenges/:id', (req, res) => {
     Challenge.findByIdAndDelete(req.params.id).then((result) => {
       if (result === null) {
-        return res.json({ message: 'User does not exist.' })
+        return res.json({ message: 'Challenge does not exist.' })
       }
       return res.json({
         message: 'Successfully deleted.',
