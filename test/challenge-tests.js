@@ -32,7 +32,8 @@ after((done) => {
 
 describe('Challenge API Endpoints', () => {
   let challengeId = ''
-  let challengeId2 = ''
+  let solutionsId = ''
+  let solutions2Id = ''
   let userId = ''
 
   beforeEach((done) => {
@@ -46,6 +47,7 @@ describe('Challenge API Endpoints', () => {
     const sampleSolution = new Solution(
       { testsolutions: [[1, 2, 3], [4, 5, 6], [90, 91, 92, 93, 94]] },
     )
+    solutionsId = sampleSolution._id
 
     const sampleChallenge = new Challenge({
       name: 'sample challenge',
@@ -58,6 +60,7 @@ describe('Challenge API Endpoints', () => {
     challengeId = sampleChallenge._id
 
     const sampleSolution2 = new Solution({ testsolutions: [0] })
+    solutions2Id = sampleSolution2._id
 
     const sampleChallenge2 = new Challenge({
       name: 'just-another-problem',
@@ -86,10 +89,16 @@ describe('Challenge API Endpoints', () => {
   afterEach((done) => {
     Challenge.deleteMany({ name: ['sample challenge', 'just-another-problem', 'A created challenge'] })
       .then(() => {
-        User.deleteMany({ email: ['user@test.com'] })
+        Solution.deleteMany({ _id: [solutionsId, solutions2Id] })
           .then(() => {
-            done()
-          }).catch((err) => {
+            User.deleteMany({ email: ['user@test.com'] })
+              .then(() => {
+                done()
+              }).catch((err) => {
+                done(err)
+              })
+          })
+          .catch(() => {
             done(err)
           })
       }).catch((err) => {
