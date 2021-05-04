@@ -225,9 +225,10 @@ describe('Challenge API Endpoints', () => {
       })
   })
 
-  it('should fail to delete a challenge', (done) => {
+  it('should fail to update a challenge', (done) => {
     chai.request(app)
-      .delete(`/challenges/${challengeId}`)
+      .put(`/challenges/${challengeId}`)
+      .send({ difficulty: 8 })
       .end((err, res) => {
         if (err) { done(err) }
         expect(res).to.have.status(401)
@@ -251,6 +252,16 @@ describe('Challenge API Endpoints', () => {
         }).catch((err) => {
           done(err)
         })
+      })
+  })
+
+  it('should fail to delete a challenge', (done) => {
+    chai.request(app)
+      .delete(`/challenges/${challengeId}`)
+      .end((err, res) => {
+        if (err) { done(err) }
+        expect(res).to.have.status(401)
+        done()
       })
   })
 })
