@@ -1,4 +1,6 @@
+const { expect } = require('chai');
 const Challenge = require('../models/challenge');
+const Solution = require('../models/solution')
 
 module.exports = (app) => {
   // GET filtered challenges
@@ -39,7 +41,12 @@ module.exports = (app) => {
       res.status(401)
       return res.json({ message: 'not authorized' })
     }
-
+    // Create a solution from given test solutions
+    const solution = new Solution(req.body.testsolutions)
+    // Modify the challenge object to have the solution id
+    const newChallengeObject = req.body
+    newChallengeObject.testsolutionsID = solution._id
+    // Create the new challenge
     const challenge = new Challenge(req.body)
     challenge.author = req.user._id
 
@@ -90,28 +97,37 @@ module.exports = (app) => {
 
     Challenge.findById(req.params.id)
       .then((challenge) => {
+        // The users attempt
         const solution = req.body.attempt
-        const challengeToSolve = challenge.testsolutions
+        // The solution object id
+        const solutionID = challenge.testsolutionsID
         let solved = true
 
-        // For each solution
-        for (let i = 0; i < solution.length; i += 1) {
-          // check if it equals the challenge solution
-          if (JSON.stringify(challengeToSolve[i]) !== JSON.stringify(solution[i])) {
-            // If it doesnt match, send index of test it failed on and user friendly message
-            solved = false
-            res.send({
-              success: false,
-              failedOn: i,
-              message: `expected: ${challengeToSolve[i]}, but recieved: ${solution[i]}`,
-            })
-          }
-        }
-
-        // If all matches were found send success
-        if (solved) {
-          res.send({ success: true })
-        }
+        // Get the solution object
+        Solution.findById(solutionID)
+          .then((expected) => {
+            // For each solution
+            for (let i = 0; i < solution.length; i += 1) {
+              // check if it equals the challenge solution
+              if (JSON.stringify(expected.testsolutions[i]) !== JSON.stringify(solution[i])) {
+                // If it doesnt match, send index of test it failed on and user friendly message
+                solved = false
+                res.send({
+                  success: false,
+                  failedOn: i,
+                  message: `expected: ${expected.testsolutions[i]}, but recieved: ${solution[i]}`,
+                })
+              }
+            }
+            // If all matches were found send success
+            if (solved) {
+              res.send({ success: true })
+            }
+          })
+          .catch((err) => {
+            console.log(err.message)
+            throw err.message
+          })
       })
       .catch((err) => {
         console.log(err.message);

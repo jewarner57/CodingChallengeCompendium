@@ -8,6 +8,7 @@ const { assert } = chai
 
 const User = require('../models/user.js')
 const Challenge = require('../models/challenge.js')
+const Solution = require('../models/solution.js')
 
 chai.config.includeStack = true
 
@@ -42,28 +43,36 @@ describe('Challenge API Endpoints', () => {
 
     userId = sampleUser._id
 
+    const sampleSolution = new Solution(
+      { testsolutions: [[1, 2, 3], [4, 5, 6], [90, 91, 92, 93, 94]] },
+    )
+
     const sampleChallenge = new Challenge({
       name: 'sample challenge',
       difficulty: 1,
       description: 'a sample challenge',
       testcases: [[1, 3], [4, 6], [90, 94]],
-      testsolutions: [[1, 2, 3], [4, 5, 6], [90, 91, 92, 93, 94]],
+      testsolutionsID: sampleSolution._id,
       author: sampleUser._id,
     })
     challengeId = sampleChallenge._id
+
+    const sampleSolution2 = new Solution({ testsolutions: [0] })
 
     const sampleChallenge2 = new Challenge({
       name: 'just-another-problem',
       difficulty: 10,
       description: 'a problem',
       testcases: [0],
-      testsolutions: [0],
+      testsolutionsID: sampleSolution2._id,
       author: sampleUser._id,
     })
 
     challengeId2 = sampleChallenge2._id
 
-    sampleChallenge.save()
+    sampleSolution.save()
+      .then(() => { sampleSolution2.save() })
+      .then(() => { sampleChallenge.save() })
       .then(() => { sampleChallenge2.save() })
       .then(() => { sampleUser.save() })
       .then(() => {

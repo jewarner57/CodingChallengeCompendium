@@ -8,7 +8,7 @@ const ChallengeSchema = new Schema({
   description: { type: String, required: true },
   hint: { type: String, required: false },
   testcases: { type: Array, required: true },
-  testsolutions: { type: Array, required: true },
+  testsolutionsID: { type: Schema.Types.ObjectId, ref: 'Solution', required: true },
   author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   // comapanies
   // datastructures / algorithms used
