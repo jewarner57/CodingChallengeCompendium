@@ -35,7 +35,11 @@ module.exports = (app) => {
 
   // CREATE a challenge
   app.post('/challenges/', (req, res) => {
+    const currentUser = req.user;
+
     const challenge = new Challenge(req.body)
+    challenge.author = req.user._id
+
     challenge.save()
       .then((newChall) => res.json({ challenge: newChall }))
       .catch((err) => {

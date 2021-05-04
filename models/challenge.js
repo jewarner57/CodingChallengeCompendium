@@ -9,6 +9,7 @@ const ChallengeSchema = new Schema({
   hint: { type: String, required: false },
   testcases: { type: Array, required: true },
   testsolutions: { type: Array, required: true },
+  author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   // comapanies
   // datastructures / algorithms used
 }, { timestamps: { createdAt: 'created_at' } });

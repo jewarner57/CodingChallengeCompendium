@@ -15,6 +15,8 @@ const { expect } = chai
 const should = chai.should()
 chai.use(chaiHttp)
 
+const agent = chai.request.agent(app)
+
 /**
  * root level hooks
  */
@@ -23,19 +25,29 @@ after((done) => {
   mongoose.models = {}
   mongoose.modelSchemas = {}
   mongoose.connection.close()
+  agent.close()
   done()
 })
 
 describe('Challenge API Endpoints', () => {
   let challengeId = ''
+  let userId = ''
 
   beforeEach((done) => {
+    const sampleUser = new User({
+      email: 'user@test.com',
+      password: 'mypassword',
+    })
+
+    userId = sampleUser._id
+
     const sampleChallenge = new Challenge({
       name: 'sample challenge',
       difficulty: 1,
       description: 'a sample challenge',
       testcases: [[1, 3], [4, 6], [90, 94]],
       testsolutions: [[1, 2, 3], [4, 5, 6], [90, 91, 92, 93, 94]],
+      author: sampleUser._id,
     })
     challengeId = sampleChallenge._id
 
@@ -45,24 +57,24 @@ describe('Challenge API Endpoints', () => {
       description: 'a problem',
       testcases: [0],
       testsolutions: [0],
+      author: sampleUser._id,
     })
 
-    const sampleUser = new User({
-      email: 'test@user.com',
-      password: 'my password',
-    })
-
-    sampleChallenge.save().catch((err) => { console.log(err) })
-    sampleChallenge2.save().catch((err) => { console.log(err) })
-    sampleUser.save().catch((err) => { console.log(err) })
-
-    done()
+    sampleChallenge.save()
+      .then(() => { sampleChallenge2.save() })
+      .then(() => { sampleUser.save() })
+      .then(() => {
+        agent
+          .post('/login')
+          .send({ email: sampleUser.email, password: sampleUser.password })
+          .then(() => { done() })
+      })
   })
 
   afterEach((done) => {
     Challenge.deleteMany({ name: ['sample challenge', 'just-another-problem', 'A created challenge'] })
       .then(() => {
-        User.deleteMany({ email: ['test@user.com'] })
+        User.deleteMany({ email: ['user@test.com'] })
           .then(() => {
             done()
           }).catch((err) => {
@@ -74,7 +86,7 @@ describe('Challenge API Endpoints', () => {
   })
 
   it('should get all challenges', (done) => {
-    chai.request(app)
+    agent
       .get('/challenges')
       .end((err, res) => {
         if (err) { done(err) }
@@ -86,7 +98,7 @@ describe('Challenge API Endpoints', () => {
   })
 
   it('should get a challenge by id', (done) => {
-    chai.request(app)
+    agent
       .get(`/challenges/${challengeId}`)
       .end((err, res) => {
         if (err) { done(err) }
@@ -100,7 +112,7 @@ describe('Challenge API Endpoints', () => {
   })
 
   it('should get filtered list of challenges by difficulty', (done) => {
-    chai.request(app)
+    agent
       .get('/challenges?difficulty=10')
       .end((err, res) => {
         if (err) { done(err) }
@@ -114,7 +126,7 @@ describe('Challenge API Endpoints', () => {
   })
 
   it('should get filtered list of challenges by name', (done) => {
-    chai.request(app)
+    agent
       .get('/challenges?q=problem')
       .end((err, res) => {
         if (err) { done(err) }
@@ -130,7 +142,7 @@ describe('Challenge API Endpoints', () => {
 
   it('should solve a challenge', (done) => {
     const solutionsArr = JSON.stringify({ attempt: [[1, 2, 3], [4, 5, 6], [90, 91, 92, 93, 94]] })
-    chai.request(app)
+    agent
       .post(`/challenges/${challengeId}/solve`)
       .set('content-type', 'application/json;charset=UTF-8')
       .send(solutionsArr)
@@ -147,7 +159,7 @@ describe('Challenge API Endpoints', () => {
 
   it('should fail to solve a challenge', (done) => {
     const solutionsArr = JSON.stringify({ attempt: [0] })
-    chai.request(app)
+    agent
       .post(`/challenges/${challengeId}/solve`)
       .set('content-type', 'application/json;charset=UTF-8')
       .send(solutionsArr)
@@ -170,22 +182,28 @@ describe('Challenge API Endpoints', () => {
       testcases: [0],
       testsolutions: [0],
     }
-    chai.request(app)
+    agent
       .post('/challenges/')
       .send(newChallenge)
       .end((err, res) => {
         if (err) { done(err) }
         expect(res).to.have.status(200)
-        Challenge.find(res._id).then((challenge) => {
-          expect(challenge).to.be.not.null
-          expect(challenge.name).to.be.equal('A created challenge')
-        })
-        done()
+        expect(res.body.challenge.name).to.equal(newChallenge.name)
+
+        Challenge.findOne({ _id: res.body.challenge._id })
+          .then((challenge) => {
+            expect(challenge.name).to.equal(newChallenge.name)
+            expect(String(challenge.author)).to.equal(String(userId))
+            done()
+          })
+          .catch((err) => {
+            done(err)
+          })
       })
   })
 
   it('should update a challenge', (done) => {
-    chai.request(app)
+    agent
       .put(`/challenges/${challengeId}`)
       .send({ difficulty: 8 })
       .end((err, res) => {
@@ -205,7 +223,7 @@ describe('Challenge API Endpoints', () => {
   })
 
   it('should delete a challenge', (done) => {
-    chai.request(app)
+    agent
       .delete(`/challenges/${challengeId}`)
       .end((err, res) => {
         if (err) { done(err) }

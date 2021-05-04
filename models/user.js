@@ -8,6 +8,7 @@ const UserSchema = new Schema({
   updatedAt: { type: Date },
   password: { type: String, select: false },
   email: { type: String, required: true },
+  challenges: [{ type: Schema.Types.ObjectId, ref: 'Challenge' }],
 }, { timestamps: { createdAt: 'created_at' } });
 
 // Must use function here! ES6 => functions do not bind this!
