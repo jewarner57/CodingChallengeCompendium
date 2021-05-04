@@ -42,7 +42,7 @@ module.exports = (app) => {
       return res.json({ message: 'not authorized' })
     }
     // Create a solution from given test solutions
-    const solution = new Solution(req.body.testsolutions)
+    const solution = new Solution({ testsolutions: req.body.testsolutions })
     // Modify the challenge object to have the solution id
     const newChallengeObject = req.body
     newChallengeObject.testsolutionsID = solution._id
@@ -50,11 +50,13 @@ module.exports = (app) => {
     const challenge = new Challenge(req.body)
     challenge.author = req.user._id
 
-    challenge.save()
-      .then((newChall) => res.json({ challenge: newChall }))
-      .catch((err) => {
-        throw err.message
-      })
+    solution.save().then(() => {
+      challenge.save()
+        .then((newChall) => res.json({ challenge: newChall }))
+        .catch((err) => {
+          throw err.message
+        })
+    })
   })
 
   // UPDATE a challenge

@@ -87,7 +87,7 @@ describe('Challenge API Endpoints', () => {
   })
 
   afterEach((done) => {
-    Challenge.deleteMany({ name: ['sample challenge', 'just-another-problem', 'A created challenge'] })
+    Challenge.deleteMany({ name: ['sample challenge', 'just-another-problem'] })
       .then(() => {
         Solution.deleteMany({ _id: [solutionsId, solutions2Id] })
           .then(() => {
@@ -215,6 +215,19 @@ describe('Challenge API Endpoints', () => {
           .then((challenge) => {
             expect(challenge.name).to.equal(newChallenge.name)
             expect(String(challenge.author)).to.equal(String(userId))
+
+            // Find the solution
+            Solution.findOne({ _id: challenge.testsolutionsID })
+              .then((solutions) => {
+                // Expect test solutions to match
+                const recievedSolutions = JSON.stringify(solutions.testsolutions)
+                const sentSolutions = JSON.stringify(newChallenge.testsolutions)
+                expect(recievedSolutions).to.equal(sentSolutions)
+              })
+              .catch((err) => {
+                done(err)
+              })
+
             done()
           })
           .catch((err) => {
