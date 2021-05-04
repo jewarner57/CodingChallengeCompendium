@@ -37,6 +37,11 @@ module.exports = (app) => {
   app.post('/challenges/', (req, res) => {
     const currentUser = req.user;
 
+    if (!currentUser) {
+      res.status(401)
+      return res.json({ message: 'not authorized' })
+    }
+
     const challenge = new Challenge(req.body)
     challenge.author = req.user._id
 
