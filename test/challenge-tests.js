@@ -31,6 +31,7 @@ after((done) => {
 
 describe('Challenge API Endpoints', () => {
   let challengeId = ''
+  let challengeId2 = ''
   let userId = ''
 
   beforeEach((done) => {
@@ -59,6 +60,8 @@ describe('Challenge API Endpoints', () => {
       testsolutions: [0],
       author: sampleUser._id,
     })
+
+    challengeId2 = sampleChallenge2._id
 
     sampleChallenge.save()
       .then(() => { sampleChallenge2.save() })
@@ -219,6 +222,16 @@ describe('Challenge API Endpoints', () => {
         }).catch((err) => {
           done(err)
         })
+      })
+  })
+
+  it('should fail to delete a challenge', (done) => {
+    chai.request(app)
+      .delete(`/challenges/${challengeId}`)
+      .end((err, res) => {
+        if (err) { done(err) }
+        expect(res).to.have.status(401)
+        done()
       })
   })
 

@@ -35,9 +35,7 @@ module.exports = (app) => {
 
   // CREATE a challenge
   app.post('/challenges/', (req, res) => {
-    const currentUser = req.user;
-
-    if (!currentUser) {
+    if (!req.user) {
       res.status(401)
       return res.json({ message: 'not authorized' })
     }
@@ -54,10 +52,29 @@ module.exports = (app) => {
 
   // UPDATE a challenge
   app.put('/challenges/:id', (req, res) => {
-    Challenge.findByIdAndUpdate(req.params.id, req.body)
-      .then(() => Challenge.findOne({ _id: req.params.id }))
+    if (!req.user) {
+      res.status(401)
+      return res.json({ message: 'not authorized' })
+    }
+
+    Challenge.findOne({ _id: req.params.id })
       .then((challenge) => {
-        res.json({ challenge })
+        // If the challenge author matches the current user
+        if (String(challenge.author) === String(req.user._id)) {
+          // Update the post with the new data
+          Challenge.findByIdAndUpdate(req.params.id, req.body)
+            // Find the updated challenge and send it back
+            .then(() => Challenge.findOne({ _id: req.params.id }))
+            .then((challenge) => {
+              res.json({ challenge })
+            })
+            .catch((err) => {
+              throw err.message
+            })
+        } else {
+          res.status(401)
+          return res.json({ message: 'not authorized' })
+        }
       })
       .catch((err) => {
         throw err.message
@@ -66,6 +83,11 @@ module.exports = (app) => {
 
   // SOLVE a challenge
   app.post('/challenges/:id/solve', (req, res, next) => {
+    if (!req.user) {
+      res.status(401)
+      return res.json({ message: 'not authorized' })
+    }
+
     Challenge.findById(req.params.id)
       .then((challenge) => {
         const solution = req.body.attempt
@@ -87,7 +109,9 @@ module.exports = (app) => {
         }
 
         // If all matches were found send success
-        if (solved) { res.send({ success: true }) }
+        if (solved) {
+          res.send({ success: true })
+        }
       })
       .catch((err) => {
         console.log(err.message);
@@ -96,17 +120,37 @@ module.exports = (app) => {
 
   // DELETE a challenge
   app.delete('/challenges/:id', (req, res) => {
-    Challenge.findByIdAndDelete(req.params.id).then((result) => {
-      if (result === null) {
-        return res.json({ message: 'Challenge does not exist.' })
-      }
-      return res.json({
-        message: 'Successfully deleted.',
-        _id: req.params.id,
+    if (!req.user) {
+      res.status(401)
+      return res.json({ message: 'not authorized' })
+    }
+
+    Challenge.findOne({ _id: req.params.id })
+      .then((challenge) => {
+        // If the challenge author matches the current user
+        if (String(challenge.author) === String(req.user._id)) {
+          // Find the challenge and delete it
+          Challenge.findByIdAndDelete(req.params.id).then((result) => {
+            if (result === null) {
+              return res.json({ message: 'Challenge does not exist.' })
+            }
+            return res.json({
+              message: 'Successfully deleted.',
+              _id: req.params.id,
+            })
+          })
+            .catch((err) => {
+              throw err.message
+            })
+        } else {
+          res.status(401)
+          return res.json({ message: 'not authorized' })
+        }
       })
-    })
       .catch((err) => {
-        throw err.message
+        console.log(err)
+        res.status(404)
+        res.json({ message: 'challenge not found' })
       })
   })
 }
