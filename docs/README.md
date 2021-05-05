@@ -80,6 +80,15 @@ If the user is created successfully the new user will be returned.
 /users/<id>
 ```
 
+### Update a user's email
+
+> Request body should be a PUT with the field: email
+
+```
+// Update
+/users/<id>
+```
+
 ### Delete a user by id
 ```
 // DELETE

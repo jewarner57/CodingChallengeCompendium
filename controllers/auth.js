@@ -77,6 +77,23 @@ module.exports = (app) => {
       });
   });
 
+  // UPDATE a user's email
+  app.put('/users/:id', (req, res) => {
+    if (!req.user || String(req.user._id) !== req.params.id) {
+      res.status(401)
+      return res.json({ message: 'not authorized' })
+    }
+
+    User.findByIdAndUpdate(req.params.id, { email: req.body.email })
+      .then(() => User.findOne({ _id: req.params.id }))
+      .then((user) => {
+        res.json({ user })
+      })
+      .catch((err) => {
+        throw err.message
+      })
+  })
+
   // DELETE a user
   app.delete('/users/:id', (req, res) => {
     if (!req.user || String(req.user._id) !== req.params.id) {

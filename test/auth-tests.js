@@ -15,6 +15,8 @@ const { expect } = chai
 const should = chai.should()
 chai.use(chaiHttp)
 
+const agent = chai.request.agent(app)
+
 /**
  * root level hooks
  */
@@ -40,7 +42,13 @@ describe('User API endpoints', () => {
 
     sampleUser.save()
       .then(() => {
-        done()
+        agent
+          .post('/login')
+          .send({ email: 'user@test.com', password: 'mypassword' })
+          .then((res) => {
+            console.log(res.body.message)
+            done()
+          })
       })
   })
 
@@ -55,7 +63,7 @@ describe('User API endpoints', () => {
   })
 
   it('should get one user by their id', (done) => {
-    chai.request(app)
+    agent
       .get(`/users/${userId}`)
       .end((err, res) => {
         if (err) { done(err) }
@@ -89,7 +97,7 @@ describe('User API endpoints', () => {
   })
 
   it('should update a user', (done) => {
-    chai.request(app)
+    agent
       .put(`/users/${userId}`)
       .send({ email: 'updatedUser@test.com' })
       .end((err, res) => {
@@ -109,7 +117,7 @@ describe('User API endpoints', () => {
   })
 
   it('should delete a user', (done) => {
-    chai.request(app)
+    agent
       .delete(`/users/${userId}`)
       .end((err, res) => {
         if (err) { done(err) }
@@ -144,7 +152,7 @@ describe('User API endpoints', () => {
 
   // Logout
   it('should be able to logout', (done) => {
-    chai.request(app)
+    agent
       .post('/logout')
       .end((err, res) => {
         res.should.have.status(200);
