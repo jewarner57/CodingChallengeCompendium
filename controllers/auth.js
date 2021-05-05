@@ -3,6 +3,11 @@ const User = require('../models/user');
 
 module.exports = (app) => {
   app.get('/users/:id', (req, res) => {
+    if (!req.user) {
+      res.status(401)
+      return res.json({ message: 'not authorized' })
+    }
+
     User.findOne({ _id: req.params.id })
       .then((user) => res.send(user))
       .catch((err) => console.log(err))
@@ -23,10 +28,7 @@ module.exports = (app) => {
           .then((user) => {
             const token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: '60 days' });
             res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
-            // set password hash to undefined to hide it from the user
-            const resUser = user
-            resUser.password = undefined
-            res.json({ user: resUser })
+            res.json({ user })
           })
           .catch((err) => {
             console.log(err.message);
@@ -39,7 +41,7 @@ module.exports = (app) => {
   });
 
   // LOGOUT
-  app.get('/logout', (req, res) => {
+  app.post('/logout', (req, res) => {
     res.clearCookie('nToken');
     res.json({ message: 'Logout Successful' })
   });
@@ -77,6 +79,11 @@ module.exports = (app) => {
 
   // UPDATE a user
   app.put('/users/:id', (req, res) => {
+    if (!req.user || String(req.user._id) !== req.params.id) {
+      res.status(401)
+      return res.json({ message: 'not authorized' })
+    }
+
     User.findByIdAndUpdate(req.params.id, req.body)
       .then(() => User.findOne({ _id: req.params.id }))
       .then((user) => {
@@ -89,6 +96,11 @@ module.exports = (app) => {
 
   // DELETE a user
   app.delete('/users/:id', (req, res) => {
+    if (!req.user || String(req.user._id) !== req.params.id) {
+      res.status(401)
+      return res.json({ message: 'not authorized' })
+    }
+
     User.findByIdAndDelete(req.params.id).then((result) => {
       if (result === null) {
         return res.json({ message: 'User does not exist.' })

@@ -145,7 +145,8 @@ describe('User API endpoints', () => {
   // Logout
   it('should be able to logout', (done) => {
     chai.request(app)
-      .get('/logout').end((err, res) => {
+      .post('/logout')
+      .end((err, res) => {
         res.should.have.status(200);
         expect(res).to.not.have.cookie('nToken')
         expect(res.body.message).to.be.equal('Logout Successful')
