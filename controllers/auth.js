@@ -13,20 +13,29 @@ module.exports = (app) => {
     // Create User and JWT
     const newuser = new User(req.body);
 
-    newuser
-      .save()
+    User.findOne({ email: newuser.email })
       .then((user) => {
-        const token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: '60 days' });
-        res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
-        // set password hash to undefined to hide it from the user
-        const resUser = user
-        resUser.password = undefined
-        res.json({ user: resUser })
+        // If user already exists return an error
+        if (user) { return res.status(409).send({ err: 'Email already in use.' }) }
+        // save user and send token
+        newuser
+          .save()
+          .then((user) => {
+            const token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: '60 days' });
+            res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
+            // set password hash to undefined to hide it from the user
+            const resUser = user
+            resUser.password = undefined
+            res.json({ user: resUser })
+          })
+          .catch((err) => {
+            console.log(err.message);
+            return res.status(400).send({ err });
+          });
       })
       .catch((err) => {
-        console.log(err.message);
-        return res.status(400).send({ err });
-      });
+        throw err
+      })
   });
 
   // LOGOUT
