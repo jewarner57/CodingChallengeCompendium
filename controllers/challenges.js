@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const Challenge = require('../models/challenge');
 const Solution = require('../models/solution')
+const User = require('../models/user')
 
 module.exports = (app) => {
   // GET filtered challenges
@@ -50,13 +51,22 @@ module.exports = (app) => {
     const challenge = new Challenge(req.body)
     challenge.author = req.user._id
 
-    solution.save().then(() => {
-      challenge.save()
-        .then((newChall) => res.json({ challenge: newChall }))
-        .catch((err) => {
-          throw err.message
-        })
-    })
+    // Add the challenge to the user's created challenges
+    User.findById(req.user._id)
+      .then((user) => {
+        user.createdChallenges.unshift(challenge._id);
+        user.save();
+      })
+
+    // Save the solution, challenge, and send the challenge as a res
+    solution.save()
+      .then(() => {
+        challenge.save()
+          .then((newChall) => res.json({ challenge: newChall }))
+          .catch((err) => {
+            throw err.message
+          })
+      })
   })
 
   // UPDATE a challenge
@@ -100,7 +110,7 @@ module.exports = (app) => {
     Challenge.findById(req.params.id)
       .then((challenge) => {
         // The users attempt
-        const solution = req.body.attempt
+        const { attempt } = req.body
         // The solution object id
         const solutionID = challenge.testsolutionsID
         let solved = true
@@ -109,20 +119,30 @@ module.exports = (app) => {
         Solution.findById(solutionID)
           .then((expected) => {
             // For each solution
-            for (let i = 0; i < solution.length; i += 1) {
+            for (let i = 0; i < attempt.length; i += 1) {
               // check if it equals the challenge solution
-              if (JSON.stringify(expected.testsolutions[i]) !== JSON.stringify(solution[i])) {
+              if (JSON.stringify(expected.testsolutions[i]) !== JSON.stringify(attempt[i])) {
                 // If it doesnt match, send index of test it failed on and user friendly message
                 solved = false
                 res.send({
                   success: false,
                   failedOn: i,
-                  message: `expected: ${expected.testsolutions[i]}, but recieved: ${solution[i]}`,
+                  message: `expected: ${expected.testsolutions[i]}, but recieved: ${attempt[i]}`,
                 })
               }
             }
             // If all matches were found send success
             if (solved) {
+              // Add the challenge to the user's solved challenges
+              User.findById(req.user._id)
+                .then((user) => {
+                  user.solvedChallenges.unshift(challenge._id);
+                  user.save();
+                })
+                .catch((err) => {
+                  throw (err)
+                })
+
               res.send({ success: true })
             }
           })

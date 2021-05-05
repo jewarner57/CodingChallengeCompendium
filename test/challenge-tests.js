@@ -163,7 +163,7 @@ describe('Challenge API Endpoints', () => {
   })
 
   it('should solve a challenge', (done) => {
-    const solutionsArr = JSON.stringify({ attempt: [[1, 2, 3], [4, 5, 6], [90, 91, 92, 93, 94]] })
+    const solutionsArr = { attempt: [[1, 2, 3], [4, 5, 6], [90, 91, 92, 93, 94]] }
     agent
       .post(`/challenges/${challengeId}/solve`)
       .set('content-type', 'application/json;charset=UTF-8')
@@ -180,7 +180,7 @@ describe('Challenge API Endpoints', () => {
   })
 
   it('should fail to solve a challenge', (done) => {
-    const solutionsArr = JSON.stringify({ attempt: [0] })
+    const solutionsArr = { attempt: [0] }
     agent
       .post(`/challenges/${challengeId}/solve`)
       .set('content-type', 'application/json;charset=UTF-8')
@@ -252,13 +252,14 @@ describe('Challenge API Endpoints', () => {
       .then((res) => {
         expect(res).to.have.status(200)
         expect(res.body.challenge.name).to.equal(newChallenge.name)
+        createdSolutions.unshift(res.body.challenge.testsolutionsID)
 
         Challenge.findOne({ _id: res.body.challenge._id })
           .then((challenge) => {
             expect(challenge.name).to.equal(newChallenge.name)
             expect(String(challenge.author)).to.equal(String(userId))
 
-            const solutionsArr = JSON.stringify({ attempt: newChallenge.testsolutions })
+            const solutionsArr = { attempt: newChallenge.testsolutions }
             agent
               .post(`/challenges/${challenge._id}/solve`)
               .set('content-type', 'application/json;charset=UTF-8')
