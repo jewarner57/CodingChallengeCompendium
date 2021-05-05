@@ -57,8 +57,7 @@ A failed attempt response will be an object with three properties:
 * failedOn: index of test that failed
 * message: user friendly failure message
 
-If a solution is successful it will be applied to the currently logged in user's account
-
+If a solution is successful it will be applied to the current user's account
 ```
 // POST
 /challenges/<challenge id>/solve
@@ -75,9 +74,15 @@ If a solution is successful it will be applied to the currently logged in user's
 
 If the user is created successfully the new user will be returned.
 
-### Getting a user by id
+### Get a user by id
 ```
 // GET
+/users/<id>
+```
+
+### Delete a user by id
+```
+// DELETE
 /users/<id>
 ```
 
@@ -102,8 +107,6 @@ If the user is created successfully the new user will be returned.
 // POST
 /login
 ```
-
-
 
 ### Logging out a user
 ```
