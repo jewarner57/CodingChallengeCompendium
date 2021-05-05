@@ -23,7 +23,7 @@ const checkAuth = (req, res, next) => {
     req.user = null;
   } else {
     const token = req.cookies.nToken;
-    const decodedToken = jwt.decode(token, { complete: true }) || {};
+    const decodedToken = jwt.verify(token, process.env.SECRET, { complete: true }) || {};
     req.user = decodedToken.payload;
   }
   next();

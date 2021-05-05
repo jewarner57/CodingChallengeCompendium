@@ -87,7 +87,7 @@ describe('Challenge API Endpoints', () => {
 
   afterEach((done) => {
     Challenge.deleteMany({
-      name: ['A created challenge', 'sample challenge', 'just-another-problem'],
+      name: ['A created challenge', 'sample challenge', 'just-another-problem', 'A second created challenge'],
     })
       .then(() => {
         Solution.deleteMany({ _id: createdSolutions })
@@ -235,6 +235,52 @@ describe('Challenge API Endpoints', () => {
           .catch((err) => {
             done(err)
           })
+      })
+  })
+
+  it('should create a challenge and solve it', (done) => {
+    const newChallenge = {
+      name: 'A second created challenge',
+      difficulty: 7,
+      description: 'some other description',
+      testcases: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+      testsolutions: [[6], [15], [24]],
+    }
+    agent
+      .post('/challenges/')
+      .send(newChallenge)
+      .then((res) => {
+        expect(res).to.have.status(200)
+        expect(res.body.challenge.name).to.equal(newChallenge.name)
+
+        Challenge.findOne({ _id: res.body.challenge._id })
+          .then((challenge) => {
+            expect(challenge.name).to.equal(newChallenge.name)
+            expect(String(challenge.author)).to.equal(String(userId))
+
+            const solutionsArr = JSON.stringify({ attempt: newChallenge.testsolutions })
+            agent
+              .post(`/challenges/${challenge._id}/solve`)
+              .set('content-type', 'application/json;charset=UTF-8')
+              .send(solutionsArr)
+              .then((res) => {
+                expect(res).to.have.status(200)
+                expect(res.body).to.be.an('object')
+                expect(res.body.success).to.equal(true)
+                expect(res.body.failedOn).to.equal(undefined)
+
+                done()
+              })
+              .catch((err) => {
+                done(err)
+              })
+          })
+          .catch((err) => {
+            done(err)
+          })
+      })
+      .catch((err) => {
+        done(err)
       })
   })
 
