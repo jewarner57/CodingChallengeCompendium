@@ -85,7 +85,7 @@ If the user is created successfully the new user will be returned.
 > Request body should be a PUT with the field: email
 
 ```
-// Update
+// PUT
 /users/<id>
 ```
 
