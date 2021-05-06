@@ -10,6 +10,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const expressValidator = require('express-validator');
 
+app.use(express.static('public'))
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -30,6 +32,13 @@ const checkAuth = (req, res, next) => {
 };
 app.use(checkAuth);
 
+// Add handlebars
+const exphbs = require('express-handlebars');
+
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
+
+require('./controllers/main.js')(app);
 require('./controllers/challenges.js')(app);
 require('./controllers/auth.js')(app);
 
