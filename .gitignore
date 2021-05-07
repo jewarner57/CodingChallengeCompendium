@@ -13,9 +13,6 @@
 *_LOCAL_*.txt
 *_REMOTE_*.txt
 
-### Linux ###
-*~
-
 # temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*
 
@@ -140,13 +137,6 @@ typings/
 .cache
 .parcel-cache
 
-# Next.js build output
-.next
-
-# Nuxt.js build / generate output
-.nuxt
-dist
-
 # Storybook build outputs
 .out
 .storybook-out
@@ -154,12 +144,6 @@ storybook-static
 
 # rollup.js default build output
 dist/
-
-# vuepress build output
-.vuepress/dist
-
-# Serverless directories
-.serverless/
 
 # FuseBox cache
 .fusebox/
@@ -176,18 +160,3 @@ dist/
 # Temporary folders
 tmp/
 temp/
-
-### Web ###
-*.asp
-*.cer
-*.csr
-*.css
-*.htm
-*.html
-*.js
-*.jsp
-*.php
-*.rss
-*.wasm
-*.wat
-*.xhtml
