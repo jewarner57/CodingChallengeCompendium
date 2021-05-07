@@ -38,9 +38,9 @@ const exphbs = require('express-handlebars');
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
-require('./controllers/main.js')(app);
-require('./controllers/challenges.js')(app);
-require('./controllers/auth.js')(app);
+require('./controllers/main.js');
+require('./controllers/challenges.js');
+require('./controllers/auth.js');
 
 app.listen(port, () => {
   console.log(`API listening on port http://localhost:${port}!`);
