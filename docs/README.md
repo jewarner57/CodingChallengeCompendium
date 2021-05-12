@@ -74,13 +74,16 @@ If a solution is successful it will be applied to the current user's account
   * description: { type: String, required: true },
   * hint: { type: String, required: false },
   * testcases: { type: Array, required: true }
+  * testsolutions { type: Array, required: true }
+
+* If the challenge is created successfully the new challenge will be returned.
+
 <br>
+
 ```
 // POST
 /challenges/
 ```
-
-If the challenge is created successfully the new challenge will be returned.
 
 ### Update a challenge
 
@@ -92,7 +95,9 @@ If the challenge is created successfully the new challenge will be returned.
   * description: { type: String, required: true },
   * hint: { type: String, required: false },
   * testcases: { type: Array, required: true }
+
 <br>
+
 ```
 // PUT
 /challenges/<id>

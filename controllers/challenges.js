@@ -111,6 +111,15 @@ module.exports = (app) => {
       .then((challenge) => {
         // The users attempt
         const { attempt } = req.body
+
+        if (!Array.isArray(attempt)) {
+          return res.send({
+            success: false,
+            failedOn: 1,
+            message: `expected: ${expected.testsolutions[i]}, but recieved: undefined`,
+          })
+        }
+
         // The solution object id
         const solutionID = challenge.testsolutionsID
         let solved = true
