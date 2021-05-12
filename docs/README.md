@@ -65,11 +65,12 @@ If a solution is successful it will be applied to the current user's account
 
 ## CRUDing challenges
 
-### Creating a challenge
+### Create a challenge
 > You must be logged in as a user to create challenges
 
 * Creating a challenge must be done with a POST request with an object containing:
-  * name, difficulty: { type: Number, required: true },
+  * name: { type: String, required: true },
+  * difficulty: { type: Number, required: true },
   * description: { type: String, required: true },
   * hint: { type: String, required: false },
   * testcases: { type: Array, required: true }
@@ -84,8 +85,9 @@ If the challenge is created successfully the new challenge will be returned.
 
 > You must be logged in as the challenge author to update a challenge
 
-* Request body should be a PUT with the fields: 
-  * name, difficulty: { type: Number, required: true },
+* Request body should be a PUT with the fields (only fill the fields you want to update): 
+  * name: { type: String, required: true },
+  * difficulty: { type: Number, required: true },
   * description: { type: String, required: true },
   * hint: { type: String, required: false },
   * testcases: { type: Array, required: true }
@@ -106,7 +108,7 @@ If the challenge is created successfully the new challenge will be returned.
 
 ## Users and authentication
 
-### Creating a user
+### Create a user
 * Creating a user must be done with a POST request with fields: 
   * password: { type: String, select: false },
   * email: { type: String, required: true },
