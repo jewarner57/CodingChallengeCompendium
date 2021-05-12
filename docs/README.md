@@ -74,6 +74,7 @@ If a solution is successful it will be applied to the current user's account
   * description: { type: String, required: true },
   * hint: { type: String, required: false },
   * testcases: { type: Array, required: true }
+<br>
 ```
 // POST
 /challenges/
@@ -91,7 +92,7 @@ If the challenge is created successfully the new challenge will be returned.
   * description: { type: String, required: true },
   * hint: { type: String, required: false },
   * testcases: { type: Array, required: true }
-
+<br>
 ```
 // PUT
 /challenges/<id>
@@ -160,7 +161,7 @@ If the user is created successfully the new user will be returned.
 ```
 
 ### Logging in a user
-* Logging in a user must be done with a POST request with fields: email, password
+* Logging in a user must be done with a POST request with fields:
   * password: { type: String, select: false },
   * email: { type: String, required: true },
 ```
