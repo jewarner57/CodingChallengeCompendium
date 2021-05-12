@@ -2,6 +2,9 @@
 
 > The single source of truth for coding challenges across the web.
 
+* Check out the live api here:
+  * [coding-challenge-compendium.herokuapp.com](https://coding-challenge-compendium.herokuapp.com/)
+
 ## Getting Challenges
 
 ### Query all challenges
