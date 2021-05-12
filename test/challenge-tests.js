@@ -196,6 +196,21 @@ describe('Challenge API Endpoints', () => {
       })
   })
 
+  it('should send an empty solution without error', (done) => {
+    agent
+      .post(`/challenges/${challengeId}/solve`)
+      .set('content-type', 'application/json;charset=UTF-8')
+      .end((err, res) => {
+        if (err) { done(err) }
+        expect(res).to.have.status(200)
+        expect(res.body).to.be.an('object')
+        expect(res.body.success).to.equal(false)
+        expect(res.body.failedOn).to.not.equal('an empty solution array is not valid')
+
+        done()
+      })
+  })
+
   it('should create a challenge', (done) => {
     const newChallenge = {
       name: 'A created challenge',

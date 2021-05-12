@@ -115,8 +115,8 @@ module.exports = (app) => {
         if (!Array.isArray(attempt)) {
           return res.send({
             success: false,
-            failedOn: 1,
-            message: `expected: ${expected.testsolutions[i]}, but recieved: undefined`,
+            failedOn: 0,
+            message: 'an empty solution array is not valid',
           })
         }
 
