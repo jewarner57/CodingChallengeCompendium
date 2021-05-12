@@ -112,6 +112,7 @@ module.exports = (app) => {
         // The users attempt
         const { attempt } = req.body
 
+        // If the user sends an empty attempt
         if (!Array.isArray(attempt)) {
           return res.send({
             success: false,
@@ -145,14 +146,23 @@ module.exports = (app) => {
               // Add the challenge to the user's solved challenges
               User.findById(req.user._id)
                 .then((user) => {
-                  user.solvedChallenges.unshift(challenge._id);
-                  user.save();
+                  const { solvedChallenges } = user
+                  solvedChallenges.unshift(req.params.id)
+
+                  User.findOneAndUpdate(
+                    { _id: user._id },
+                    { solvedChallenges },
+                  )
+                    .then(() => {
+                      res.send({ success: true })
+                    })
+                    .catch((err) => {
+                      throw (err)
+                    })
                 })
                 .catch((err) => {
                   throw (err)
                 })
-
-              res.send({ success: true })
             }
           })
           .catch((err) => {

@@ -175,7 +175,14 @@ describe('Challenge API Endpoints', () => {
         expect(res.body.success).to.equal(true)
         expect(res.body.failedOn).to.equal(undefined)
 
-        done()
+        User.findOne({ _id: userId })
+          .then((user) => {
+            expect(user.solvedChallenges).to.contain(challengeId)
+            done()
+          })
+          .catch((err) => {
+            console.log(err)
+          })
       })
   })
 
